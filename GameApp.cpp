@@ -23,19 +23,13 @@ int GameApp::init() {
   _tickEvent.bind([this](float time) {
     tick(time);
   });
+  CocosApplication::init();
   _gameManager.init();
-  return CocosApplication::init();
+  return 0;
 }
 
 void GameApp::setCurrentGame(IGame *game) {
     _game = game;
-}
-
-void GameApp::onStart() {
-  if (_game != nullptr) {
-      _game->onStart();
-  }
-  CocosApplication::onStart();
 }
 
 void GameApp::onPause() {

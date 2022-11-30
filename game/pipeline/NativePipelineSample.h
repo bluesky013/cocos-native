@@ -17,8 +17,9 @@ public:
     NativePipelineSample() = default;
     ~NativePipelineSample() = default;
 
+    void init();
+
 private:
-    void onStart() override;
     void onPause() override;
     void onResume() override;
     void onClose() override;
@@ -30,6 +31,8 @@ private:
 
     void initScene();
     void initRenderWindow(uint32_t windowId, ISystemWindow *window);
+    void initWindowEvent();
+    void initPipeline();
 
     using CameraPtr = IntrusivePtr<scene::Camera>;
 

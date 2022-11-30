@@ -22,7 +22,33 @@ void NativePipelineSample::initScene() {
     _scene->initialize(sceneInfo);
 
     _mainCamera = addCamera("MainCamera");
+    _mainCamera->changeTargetWindow(_mainRenderWindow);
     setActive(_mainCamera);
+}
+
+void NativePipelineSample::initWindowEvent() {
+    _windowDestroyListener.bind([this](uint32_t windowId) -> void {
+        _mainRenderWindow->onNativeWindowDestroy(windowId);
+    });
+
+    _windowRecreatedListener.bind([this](uint32_t windowId) -> void {
+        _mainRenderWindow->onNativeWindowResume(windowId);
+    });
+}
+
+void NativePipelineSample::initPipeline() {
+    _ppl.reset(render::Factory::createPipeline());
+    auto *layoutGraph = _ppl->getLayoutGraphBuilder();
+    uint32_t forwardColorId = layoutGraph->addRenderStage("forwardColor");
+    uint32_t forwardQueueId = layoutGraph->addRenderPhase("Queue", forwardColorId);
+
+    layoutGraph->compile();
+    layoutGraph->print();
+
+    if (!_ppl->activate(_swapChains[0])) {
+        _ppl->destroy();
+        _ppl.reset();
+    }
 }
 
 void NativePipelineSample::initRenderWindow(uint32_t windowId, ISystemWindow *window) {
@@ -55,13 +81,10 @@ void NativePipelineSample::initRenderWindow(uint32_t windowId, ISystemWindow *wi
     depthStencilAttachment.stencilStoreOp = gfx::StoreOp::DISCARD;
     _mainRenderWindow = ccnew scene::RenderWindow();
     _mainRenderWindow->initialize(_device, windowInfo);
-
-    _mainCamera->changeTargetWindow(_mainRenderWindow);
 }
 
-void NativePipelineSample::onStart() {
+void NativePipelineSample::init() {
     _device = gfx::Device::getInstance();
-
     auto *windowMgr = CC_GET_PLATFORM_INTERFACE(ISystemWindowManager);
     const auto &windows = windowMgr->getWindows();
     for (auto &[winId, sysWindow] : windows) {
@@ -69,15 +92,9 @@ void NativePipelineSample::onStart() {
         break;
     }
 
+    initWindowEvent();
     initScene();
-
-    _ppl.reset(render::Factory::createPipeline());
-    auto *layoutGraph = _ppl->getLayoutGraphBuilder();
-    uint32_t forwardColorId = layoutGraph->addRenderStage("forwardColor");
-    uint32_t forwardQueueId = layoutGraph->addRenderPhase("Queue", forwardColorId);
-
-    layoutGraph->compile();
-    layoutGraph->print();
+    initPipeline();
 }
 
 void NativePipelineSample::onPause() {
@@ -89,7 +106,18 @@ void NativePipelineSample::onResume() {
 }
 
 void NativePipelineSample::onClose() {
+    _windowDestroyListener.reset();
+    _windowRecreatedListener.reset();
 
+    _scene = nullptr;
+    _mainRenderWindow = nullptr;
+
+    _cameras.clear();
+    _ppl = nullptr;
+    for (auto *swapchain : _swapChains) {
+        CC_SAFE_DELETE(swapchain);
+    }
+    _swapChains.clear();
 }
 
 void NativePipelineSample::onTick(float time) {

@@ -18,7 +18,6 @@ public:
 
 private:
   int init() override;
-  void onStart() override;
   void onPause() override;
   void onResume() override;
   void onClose() override;

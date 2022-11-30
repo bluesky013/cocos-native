@@ -6,7 +6,10 @@
 namespace cc {
 
 void GameManager::init() {
-    _currentGame = std::make_unique<NativePipelineSample>();
+    auto *sample = ccnew NativePipelineSample();
+    sample->init();
+
+    _currentGame.reset(sample);
     _app->setCurrentGame(_currentGame.get());
 }
 
