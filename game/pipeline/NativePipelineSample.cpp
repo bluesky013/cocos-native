@@ -39,11 +39,34 @@ void NativePipelineSample::initWindowEvent() {
 void NativePipelineSample::initPipeline() {
     _ppl.reset(render::Factory::createPipeline());
     auto *layoutGraph = _ppl->getLayoutGraphBuilder();
-    uint32_t forwardColorId = layoutGraph->addRenderStage("forwardColor");
-    uint32_t forwardQueueId = layoutGraph->addRenderPhase("Queue", forwardColorId);
+    _ppl->beginSetup();
+    uint32_t cleanScreenId = layoutGraph->addRenderStage("clean");
+    uint32_t forwardQueueId = layoutGraph->addRenderPhase("Queue", cleanScreenId);
 
     layoutGraph->compile();
     layoutGraph->print();
+
+    _ppl->addRenderTexture("output1", gfx::Format::BGRA8, 800, 600, _mainRenderWindow);
+    _ppl->addRenderTarget("output2", gfx::Format::RGBA8, 800, 600);
+    auto *passBuilder = _ppl->addRasterPass(800, 600, "clean");
+    passBuilder->addRasterView("output1", {" ",
+                                           render::AccessType::WRITE,
+                                           render::AttachmentType::RENDER_TARGET,
+                                           gfx::LoadOp::CLEAR,
+                                           gfx::StoreOp::STORE,
+                                           gfx::ClearFlagBit::ALL,
+                                           gfx::Color{1, 0, 0, 1}});
+
+    passBuilder->addRasterView("output2", {" ",
+                                           render::AccessType::WRITE,
+                                           render::AttachmentType::RENDER_TARGET,
+                                           gfx::LoadOp::CLEAR,
+                                           gfx::StoreOp::STORE,
+                                           gfx::ClearFlagBit::ALL,
+                                           gfx::Color{0, 1, 0, 1}});
+
+    _ppl->presentAll();
+    _ppl->endSetup();
 
     if (!_ppl->activate(_swapChains[0])) {
         _ppl->destroy();
@@ -125,7 +148,13 @@ void NativePipelineSample::onTick(float time) {
         std::stable_sort(_activeCameras.begin(), _activeCameras.end(), [](const auto *a, const auto *b) {
             return a->getPriority() < b->getPriority();
         });
+
+        _device->acquire(_swapChains);
+
+        _ppl->beginFrame();
         _ppl->render(_activeCameras);
+        _ppl->endFrame();
+
         _device->present();
     }
 }
