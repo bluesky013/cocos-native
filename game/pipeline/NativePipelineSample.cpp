@@ -49,6 +49,11 @@ void NativePipelineSample::initPipeline() {
     _ppl->addRenderTexture("output1", gfx::Format::BGRA8, 800, 600, _mainRenderWindow);
     _ppl->addRenderTarget("output2", gfx::Format::RGBA8, 800, 600);
     auto *passBuilder = _ppl->addRasterPass(800, 600, "clean");
+
+    Material material;
+
+//    passBuilder->addQueue()->addFullscreenQuad()
+
     passBuilder->addRasterView("output1", {" ",
                                            render::AccessType::WRITE,
                                            render::AttachmentType::RENDER_TARGET,
