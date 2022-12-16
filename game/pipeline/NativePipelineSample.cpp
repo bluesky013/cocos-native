@@ -1,4 +1,5 @@
 #include "pipeline/NativePipelineSample.h"
+#include <pipeline/custom/NativePipelineTypes.h>
 
 // framework
 #include "application/ApplicationManager.h"
@@ -20,6 +21,7 @@ void NativePipelineSample::initScene() {
     scene::IRenderSceneInfo sceneInfo = {"MainScene"};
     _scene = ccnew scene::RenderScene();
     _scene->initialize(sceneInfo);
+    _scene->activate();
 
     _mainCamera = addCamera("MainCamera");
     _mainCamera->changeTargetWindow(_mainRenderWindow);
@@ -38,22 +40,23 @@ void NativePipelineSample::initWindowEvent() {
 
 void NativePipelineSample::initPipeline() {
     _ppl.reset(render::Factory::createPipeline());
-    auto *layoutGraph = _ppl->getLayoutGraphBuilder();
-    _ppl->beginSetup();
-    uint32_t cleanScreenId = layoutGraph->addRenderStage("clean");
-    uint32_t forwardQueueId = layoutGraph->addRenderPhase("Queue", cleanScreenId);
-
+    auto *layoutGraph = static_cast<render::NativeLayoutGraphBuilder*>(_ppl->getLayoutGraphBuilder());
+    uint32_t stageId = layoutGraph->addRenderStage("Color");
+    uint32_t opaqueId = layoutGraph->addRenderPhase("Queue", stageId);
     layoutGraph->compile();
-    layoutGraph->print();
 
+    auto *graphData = layoutGraph->data;
+    auto& phase = graphData->phases[opaqueId];
+
+//    phase.shaderIndex.emplace("test", phase.shaderPrograms.size());
+//    phase.shaderPrograms.emplace_back(render::ShaderProgramData(graphData->resource()));
+//    auto &shaderProgram = phase.shaderPrograms.back();
+
+    _ppl->beginSetup();
     _ppl->addRenderTexture("output1", gfx::Format::BGRA8, 800, 600, _mainRenderWindow);
-    _ppl->addRenderTarget("output2", gfx::Format::RGBA8, 800, 600);
-    auto *passBuilder = _ppl->addRasterPass(800, 600, "clean");
+    auto *passBuilder = _ppl->addRasterPass(800, 600, "Color");
 
-    Material material;
-
-//    passBuilder->addQueue()->addFullscreenQuad()
-
+    auto *queueBuilder = passBuilder->addQueue(render::QueueHint::RENDER_OPAQUE);
     passBuilder->addRasterView("output1", {" ",
                                            render::AccessType::WRITE,
                                            render::AttachmentType::RENDER_TARGET,
@@ -61,17 +64,13 @@ void NativePipelineSample::initPipeline() {
                                            gfx::StoreOp::STORE,
                                            gfx::ClearFlagBit::ALL,
                                            gfx::Color{1, 0, 0, 1}});
-
-    passBuilder->addRasterView("output2", {" ",
-                                           render::AccessType::WRITE,
-                                           render::AttachmentType::RENDER_TARGET,
-                                           gfx::LoadOp::CLEAR,
-                                           gfx::StoreOp::STORE,
-                                           gfx::ClearFlagBit::ALL,
-                                           gfx::Color{0, 1, 0, 1}});
+    queueBuilder->addSceneOfCamera(_mainCamera, {}, render::SceneFlags::OPAQUE_OBJECT);
 
     _ppl->presentAll();
     _ppl->endSetup();
+
+    auto data = layoutGraph->print();
+    auto *layout = _ppl->getDescriptorSetLayout("s1", render::UpdateFrequency::PER_PASS);
 
     if (!_ppl->activate(_swapChains[0])) {
         _ppl->destroy();
@@ -154,6 +153,8 @@ void NativePipelineSample::onTick(float time) {
             return a->getPriority() < b->getPriority();
         });
 
+        _scene->update(time);
+
         _device->acquire(_swapChains);
 
         _ppl->beginFrame();
@@ -173,6 +174,7 @@ scene::Camera *NativePipelineSample::addCamera(const ccstd::string &key) {
 
 void NativePipelineSample::setActive(scene::Camera *camera) {
     _activeCameras.emplace_back(camera);
+    _scene->addCamera(camera);
 }
 
 void NativePipelineSample::setDeActive(scene::Camera *camera) {
