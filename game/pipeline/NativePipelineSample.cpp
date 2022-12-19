@@ -1,5 +1,6 @@
 #include "pipeline/NativePipelineSample.h"
 #include <pipeline/custom/NativePipelineTypes.h>
+#include <pipeline/custom/LayoutGraphGraphs.h>
 
 // framework
 #include "application/ApplicationManager.h"
@@ -21,7 +22,6 @@ void NativePipelineSample::initScene() {
     scene::IRenderSceneInfo sceneInfo = {"MainScene"};
     _scene = ccnew scene::RenderScene();
     _scene->initialize(sceneInfo);
-    _scene->activate();
 
     _mainCamera = addCamera("MainCamera");
     _mainCamera->changeTargetWindow(_mainRenderWindow);
@@ -45,12 +45,8 @@ void NativePipelineSample::initPipeline() {
     uint32_t opaqueId = layoutGraph->addRenderPhase("Queue", stageId);
     layoutGraph->compile();
 
-    auto *graphData = layoutGraph->data;
-    auto& phase = graphData->phases[opaqueId];
-
-//    phase.shaderIndex.emplace("test", phase.shaderPrograms.size());
-//    phase.shaderPrograms.emplace_back(render::ShaderProgramData(graphData->resource()));
-//    auto &shaderProgram = phase.shaderPrograms.back();
+    auto path = render::getPath(opaqueId, *layoutGraph->data);
+    auto &val = render::get<render::RenderPhaseData>(path, *layoutGraph->data);
 
     _ppl->beginSetup();
     _ppl->addRenderTexture("output1", gfx::Format::BGRA8, 800, 600, _mainRenderWindow);
@@ -68,9 +64,6 @@ void NativePipelineSample::initPipeline() {
 
     _ppl->presentAll();
     _ppl->endSetup();
-
-    auto data = layoutGraph->print();
-    auto *layout = _ppl->getDescriptorSetLayout("s1", render::UpdateFrequency::PER_PASS);
 
     if (!_ppl->activate(_swapChains[0])) {
         _ppl->destroy();
