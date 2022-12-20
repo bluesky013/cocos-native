@@ -1,5 +1,9 @@
 #include "GameApp.h"
 #include "interfaces/modules/ISystemWindowManager.h"
+#include <core/jobsystem/JobSystem.h>
+#include <core/asset/DataBase.h>
+#include "FileUtils.h"
+#include "ProjectRoot.h"
 
 namespace cc {
 int GameApp::init() {
@@ -25,6 +29,12 @@ int GameApp::init() {
   });
   CocosApplication::init();
   _gameManager.init();
+
+  exp::JobSystem::init();
+  FileUtils::getInstance()->setDefaultResourceRootPath(exp::PROJECT_ROOT);
+  exp::DataBase::init();
+  exp::DataBase::get()->initDataBase(exp::PROJECT_ROOT + "/pc/db.sqlite");
+
   return 0;
 }
 

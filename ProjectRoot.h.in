@@ -1,0 +1,7 @@
+#pragma once
+
+#include <string>
+
+namespace cc::exp {
+    static std::string PROJECT_ROOT  = "@CMAKE_SOURCE_DIR@";
+} // namespace cc::exp

@@ -30,8 +30,17 @@ option(USE_DEBUG_RENDERER       "Use Debug Renderer"                    OFF)
 option(USE_GEOMETRY_RENDERER    "Use Geometry Renderer"                 OFF)
 option(USE_WEBP                 "Use Webp"                              ON)
 
+include(cmake/functions.cmake)
+include(cmake/thirdparty.cmake)
+include(cmake/configuration.cmake)
+
 include(${COCOS_NATIVE_PATH}/CMakeLists.txt)
+
 include(game/game_files.cmake)
+include(core/core_files.cmake)
+
+configure_file(ProjectRoot.h.in ${CMAKE_BINARY_DIR}/Gen/ProjectRoot.h)
+include_directories(${CMAKE_BINARY_DIR}/Gen)
 
 set(NATIVE_APP cocos-native)
 
@@ -42,6 +51,16 @@ add_executable(${NATIVE_APP}
     GameManager.h
     GameManager.cpp
     ${GAME_FILES}
+    ${CORE_FILES}
+)
+
+target_link_libraries(${NATIVE_APP}
+    3rdParty::taskflow
+    3rdParty::sfmt
+)
+
+target_include_directories(${NATIVE_APP} PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}
 )
 
 if(MSVC)
