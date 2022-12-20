@@ -5,10 +5,15 @@
 #include "base/std/container/unordered_map.h"
 #include "base/std/container/vector.h"
 #include "base/Ptr.h"
+
+#include "core/scene-graph/Node.h"
+
 #include "renderer/pipeline/custom/RenderInterfaceTypes.h"
+
 #include "scene/RenderWindow.h"
 #include "scene/RenderScene.h"
 #include "scene/Camera.h"
+#include "scene/Model.h"
 
 namespace cc {
 
@@ -26,6 +31,8 @@ private:
     void onTick(float time) override;
 
     scene::Camera *addCamera(const ccstd::string &key);
+    scene::Model *addModel(const ccstd::string &key);
+
     void setActive(scene::Camera *camera);
     void setDeActive(scene::Camera *camera);
 
@@ -35,17 +42,27 @@ private:
     void initPipeline();
 
     using CameraPtr = IntrusivePtr<scene::Camera>;
+    using ModelPtr = IntrusivePtr<scene::Model>;
 
     gfx::Device *_device = nullptr;
     scene::Camera *_mainCamera = nullptr;
-    ccstd::vector<scene::Camera *> _activeCameras;
-    ccstd::unordered_map<ccstd::string, CameraPtr> _cameras;
+
     std::unique_ptr<render::Pipeline> _ppl;
     ccstd::vector<gfx::Swapchain *> _swapChains;
-    IntrusivePtr<scene::RenderScene> _scene;
-    IntrusivePtr<scene::RenderWindow> _mainRenderWindow;
     events::WindowDestroy::Listener _windowDestroyListener;
     events::WindowRecreated::Listener _windowRecreatedListener;
+
+    // scene
+    IntrusivePtr<scene::RenderScene> _scene;
+    IntrusivePtr<scene::RenderWindow> _mainRenderWindow;
+
+    ccstd::vector<scene::Camera *> _activeCameras;
+    ccstd::unordered_map<ccstd::string, CameraPtr> _cameras;
+    ccstd::unordered_map<ccstd::string, ModelPtr> _models;
+    ModelPtr uiModel = nullptr;
+
+    IntrusivePtr<Node> _root;
+    ccstd::unordered_map<ccstd::string, IntrusivePtr<Node>> _nodes;
 };
 
 

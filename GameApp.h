@@ -28,6 +28,7 @@ private:
   std::once_flag _windowCreateFlag;
   GameManager _gameManager;
   IGame *_game = nullptr;
+  std::string _xxteaKey;
 };
 
 } // namespace cc

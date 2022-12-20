@@ -10,8 +10,12 @@
 // base
 #include "base/StringUtil.h"
 
+// core
+#include "core/Root.h"
+
 // render
 #include "scene/RenderWindow.h"
+#include "render/imgui/UIManager.h"
 
 // gfx
 #include "gfx-base/GFXDevice.h"
@@ -26,6 +30,12 @@ void NativePipelineSample::initScene() {
     _mainCamera = addCamera("MainCamera");
     _mainCamera->changeTargetWindow(_mainRenderWindow);
     setActive(_mainCamera);
+
+    _root = ccnew Node();
+    uiModel = addModel("UIModel");
+    _scene->addModel(uiModel);
+
+    exp::UIManager::get()->initUI();
 }
 
 void NativePipelineSample::initWindowEvent() {
@@ -112,6 +122,8 @@ void NativePipelineSample::init() {
         break;
     }
 
+    ccnew Root(_device);
+
     initWindowEvent();
     initScene();
     initPipeline();
@@ -132,12 +144,17 @@ void NativePipelineSample::onClose() {
     _scene = nullptr;
     _mainRenderWindow = nullptr;
 
+    exp::UIManager::get()->destroy();
+
     _cameras.clear();
     _ppl = nullptr;
     for (auto *swapchain : _swapChains) {
         CC_SAFE_DELETE(swapchain);
     }
     _swapChains.clear();
+
+    auto *root = Root::getInstance();
+    delete root;
 }
 
 void NativePipelineSample::onTick(float time) {
@@ -162,7 +179,22 @@ void NativePipelineSample::onTick(float time) {
 scene::Camera *NativePipelineSample::addCamera(const ccstd::string &key) {
     auto *camera = ccnew scene::Camera(_device);
     _cameras.emplace(key, camera);
+
+    auto *node = ccnew Node(key);
+    node->setParent(_root);
+    _nodes.emplace(key, node);
     return camera;
+}
+
+scene::Model *NativePipelineSample::addModel(const ccstd::string &key) {
+    auto *model = ccnew scene::Model();
+    model->initialize();
+    _models.emplace(key, model);
+
+    auto *node = ccnew Node(key);
+    node->setParent(_root);
+    _nodes.emplace(key, node);
+    return model;
 }
 
 void NativePipelineSample::setActive(scene::Camera *camera) {

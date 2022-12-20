@@ -38,6 +38,7 @@ include(${COCOS_NATIVE_PATH}/CMakeLists.txt)
 
 include(game/game_files.cmake)
 include(core/core_files.cmake)
+include(render/render_files.cmake)
 
 configure_file(ProjectRoot.h.in ${CMAKE_BINARY_DIR}/Gen/ProjectRoot.h)
 include_directories(${CMAKE_BINARY_DIR}/Gen)
@@ -52,11 +53,13 @@ add_executable(${NATIVE_APP}
     GameManager.cpp
     ${GAME_FILES}
     ${CORE_FILES}
+    ${RENDER_FILES}
 )
 
 target_link_libraries(${NATIVE_APP}
     3rdParty::taskflow
     3rdParty::sfmt
+    3rdParty::imgui
 )
 
 target_include_directories(${NATIVE_APP} PRIVATE

@@ -22,7 +22,7 @@ public:
     }
 
     static T *get() {
-        return getPtr(false);
+        return getPtr(true);
     }
 
     static void destroy() {
