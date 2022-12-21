@@ -2,6 +2,8 @@
 #include <pipeline/custom/NativePipelineTypes.h>
 #include <pipeline/custom/LayoutGraphGraphs.h>
 
+#include "bindings/jswrapper/SeApi.h"
+
 // framework
 #include "application/ApplicationManager.h"
 #include "interfaces/modules/ISystemWindow.h"
@@ -10,13 +12,10 @@
 // base
 #include "base/StringUtil.h"
 
-// core
-#include "core/Root.h"
-
 // render
 #include "scene/RenderWindow.h"
-#include "render/imgui/UIManager.h"
 
+#include "render/imgui/UIManager.h"
 // gfx
 #include "gfx-base/GFXDevice.h"
 
@@ -30,8 +29,8 @@ void NativePipelineSample::initScene() {
     _mainCamera = addCamera("MainCamera");
     _mainCamera->changeTargetWindow(_mainRenderWindow);
     setActive(_mainCamera);
+    _scene->addCamera(_mainCamera);
 
-    _root = ccnew Node();
     uiModel = addModel("UIModel");
     _scene->addModel(uiModel);
 
@@ -175,13 +174,13 @@ void NativePipelineSample::onTick(float time) {
     }
 }
 
-
 scene::Camera *NativePipelineSample::addCamera(const ccstd::string &key) {
     auto *camera = ccnew scene::Camera(_device);
     _cameras.emplace(key, camera);
 
     auto *node = ccnew Node(key);
-    node->setParent(_root);
+    node->setParent(_world);
+    camera->setNode(node);
     _nodes.emplace(key, node);
     return camera;
 }
@@ -192,14 +191,15 @@ scene::Model *NativePipelineSample::addModel(const ccstd::string &key) {
     _models.emplace(key, model);
 
     auto *node = ccnew Node(key);
-    node->setParent(_root);
+    node->setParent(_world);
+    model->setTransform(node);
+    model->setNode(node);
     _nodes.emplace(key, node);
     return model;
 }
 
 void NativePipelineSample::setActive(scene::Camera *camera) {
     _activeCameras.emplace_back(camera);
-    _scene->addCamera(camera);
 }
 
 void NativePipelineSample::setDeActive(scene::Camera *camera) {

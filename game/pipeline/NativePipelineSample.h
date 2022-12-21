@@ -7,6 +7,7 @@
 #include "base/Ptr.h"
 
 #include "core/scene-graph/Node.h"
+#include "core/scene-graph/Scene.h"
 
 #include "renderer/pipeline/custom/RenderInterfaceTypes.h"
 
@@ -14,6 +15,9 @@
 #include "scene/RenderScene.h"
 #include "scene/Camera.h"
 #include "scene/Model.h"
+
+// core
+#include "core/Root.h"
 
 namespace cc {
 
@@ -44,6 +48,8 @@ private:
     using CameraPtr = IntrusivePtr<scene::Camera>;
     using ModelPtr = IntrusivePtr<scene::Model>;
 
+    Root *_root = nullptr;
+
     gfx::Device *_device = nullptr;
     scene::Camera *_mainCamera = nullptr;
 
@@ -61,7 +67,7 @@ private:
     ccstd::unordered_map<ccstd::string, ModelPtr> _models;
     ModelPtr uiModel = nullptr;
 
-    IntrusivePtr<Node> _root;
+    IntrusivePtr<Scene> _world;
     ccstd::unordered_map<ccstd::string, IntrusivePtr<Node>> _nodes;
 };
 

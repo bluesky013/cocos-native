@@ -15,6 +15,8 @@ void UIManager::initUI() {
 
     initFontTexture();
     mapKey();
+
+    initRenderer();
 }
 
 void UIManager::update(float time) {

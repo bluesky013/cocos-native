@@ -4,6 +4,7 @@
 #include <core/asset/DataBase.h>
 #include "FileUtils.h"
 #include "ProjectRoot.h"
+#include "bindings/jswrapper/SeApi.h"
 
 namespace cc {
 int GameApp::init() {
@@ -34,7 +35,10 @@ int GameApp::init() {
     exp::JobSystem::init();
     exp::DataBase::get()->initDataBase(exp::PROJECT_ROOT + "/pc/db.sqlite");
 
-    _gameManager.init();
+    {
+        se::AutoHandleScope hs;
+        _gameManager.init();
+    }
     return 0;
 }
 
