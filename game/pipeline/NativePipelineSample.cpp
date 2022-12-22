@@ -159,8 +159,6 @@ void NativePipelineSample::onTick(float time) {
             return a->getPriority() < b->getPriority();
         });
 
-        onSceneTick(time);
-
         _device->acquire(_swapChains);
 
         _ppl->beginFrame();
@@ -201,9 +199,5 @@ void NativePipelineSample::setActive(scene::Camera *camera) {
 
 void NativePipelineSample::setDeActive(scene::Camera *camera) {
     _activeCameras.erase(std::remove(_activeCameras.begin(), _activeCameras.end(), camera), _activeCameras.end());
-}
-
-void NativePipelineSample::onSceneTick(float time) {
-    _renderScene.tick(time);
 }
 }

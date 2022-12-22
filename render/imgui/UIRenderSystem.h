@@ -7,7 +7,7 @@
 #include "base/Ptr.h"
 #include "gfx-base/GFXInputAssembler.h"
 #include "gfx-base/GFXBuffer.h"
-#include "core/registry/Registry.h"
+#include "render/component/Registry.h"
 
 namespace cc::exp {
 

@@ -37,8 +37,6 @@ private:
     void onClose() override;
     void onTick(float time) override;
 
-    void onSceneTick(float time);
-
     scene::Camera *addCamera(const ccstd::string &key);
     scene::Model *addModel(const ccstd::string &key);
 
@@ -74,9 +72,6 @@ private:
 
     IntrusivePtr<Scene> _world;
     ccstd::unordered_map<ccstd::string, IntrusivePtr<Node>> _nodes;
-
-    // ecs
-    exp::RenderScene _renderScene;
 };
 
 

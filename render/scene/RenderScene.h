@@ -4,25 +4,36 @@
 
 #pragma once
 
+#include "base/Macros.h"
+#include "base/Ptr.h"
+#include "base/RefCounted.h"
 #include <base/std/container/vector.h>
-#include <core/registry/Registry.h>
-#include <render/imgui/UIRenderSystem.h>
 #include <scene/Camera.h>
+#include <scene/Model.h>
+#include <render/component/Registry.h>
+#include <variant>
 
 namespace cc::exp {
+
+struct SceneViewData {
+    IntrusivePtr<scene::RenderScene> scene;
+    IntrusivePtr<scene::Camera> camera;
+
+    IntrusivePtr<gfx::DescriptorSet> globalSet;
+};
 
 class RenderScene {
 public:
     RenderScene() = default;
     ~RenderScene() = default;
 
-    void tick(float time);
+    void addCamera(scene::Camera *camera);
+    void removeCamera(scene::Camera *camera);
+
+    void addModel(scene::Model *model);
+    void removeModel(scene::Model *model);
 
 private:
-    // component data
-    ccstd::vector<Registry::Entity> entities;
-    Registry registry;
 };
-
 
 }

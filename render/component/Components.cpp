@@ -3,3 +3,4 @@
 //
 
 #include "ComponentData.h"
+#include "Registry.h"
