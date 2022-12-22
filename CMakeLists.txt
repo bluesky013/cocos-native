@@ -60,6 +60,7 @@ target_link_libraries(${NATIVE_APP}
     3rdParty::taskflow
     3rdParty::sfmt
     3rdParty::imgui
+    3rdParty::entt
 )
 
 target_include_directories(${NATIVE_APP} PRIVATE

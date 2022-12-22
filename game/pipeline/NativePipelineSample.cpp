@@ -162,7 +162,7 @@ void NativePipelineSample::onTick(float time) {
             return a->getPriority() < b->getPriority();
         });
 
-        _scene->update(time);
+//        _scene->update(time);
 
         _device->acquire(_swapChains);
 

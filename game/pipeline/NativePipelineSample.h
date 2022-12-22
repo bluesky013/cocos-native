@@ -19,6 +19,9 @@
 // core
 #include "core/Root.h"
 
+// exp
+#include <render/scene/RenderScene.h>
+
 namespace cc {
 
 class NativePipelineSample : public IGame {
@@ -69,6 +72,9 @@ private:
 
     IntrusivePtr<Scene> _world;
     ccstd::unordered_map<ccstd::string, IntrusivePtr<Node>> _nodes;
+
+    // ecs
+    exp::RenderScene _renderScene;
 };
 
 
