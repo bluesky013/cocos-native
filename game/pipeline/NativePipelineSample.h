@@ -37,6 +37,8 @@ private:
     void onClose() override;
     void onTick(float time) override;
 
+    void onSceneTick(float time);
+
     scene::Camera *addCamera(const ccstd::string &key);
     scene::Model *addModel(const ccstd::string &key);
 

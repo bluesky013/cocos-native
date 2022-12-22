@@ -9,6 +9,10 @@
 #include <scene/Model.h>
 
 namespace cc::exp {
+// SceneView
+struct SceneView {
+    uint32_t windowId;
+};
 
 // Model
 struct ModelUpdateTag {};
@@ -33,15 +37,6 @@ struct ModelBufferData {
     IntrusivePtr<gfx::Buffer> worldBoundBuffer;
 };
 
-// DrawData
-struct DrawInstanceData {
-    IntrusivePtr<gfx::PipelineState> pso;
-    IntrusivePtr<gfx::DescriptorSet> localSet;
-    IntrusivePtr<gfx::DescriptorSet> matSet;
-    IntrusivePtr<gfx::InputAssembler> ia;
-    gfx::DrawInfo drawInfo;
-};
-
 // Camera
 struct CameraUpdateTag {};
 
@@ -63,12 +58,12 @@ struct CameraData {
     float fov{static_cast<float>(mathutils::toRadian(45.F))};
     float nearClip{1.0F};
     float farClip{1000.0F};
-    geometry::Frustum frustum;
-};
+    uint32_t width{1};
+    uint32_t height{1};
 
-struct CameraTransformData {
     Vec3 forward;
     Vec3 position;
+    geometry::Frustum frustum;
 };
 
 struct CameraProjectData {
@@ -78,5 +73,4 @@ struct CameraProjectData {
     Mat4 matViewProj;
     Mat4 matViewProjInv;
 };
-
 }

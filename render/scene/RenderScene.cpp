@@ -3,9 +3,12 @@
 //
 
 #include <render/scene/RenderScene.h>
+#include "render/imgui/UIRenderSystem.h"
 
 namespace cc::exp {
 
-
+void RenderScene::tick(float time) {
+    UIRenderSystem().ViewSceneData(registry, time);
+}
 
 }

@@ -27,7 +27,12 @@ struct AssetTrait {
         file.close();
     }
 
-    static void writeToFile(const std::string& path) {
+    static bool writeToFile(const std::string& path, const char* data, uint32_t size) {
+        std::ofstream file(path, std::ios::binary);
+        if (!file.is_open()) {
+            return false;
+        }
+        file.write(data, size);
     }
 };
 

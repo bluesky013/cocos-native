@@ -15,7 +15,7 @@ public:
 
     using Entity = entt::registry::entity_type;
 
-    entt::registry registry;
+    entt::registry reg;
 };
 
 }

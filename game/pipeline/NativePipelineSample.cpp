@@ -15,7 +15,8 @@
 // render
 #include "scene/RenderWindow.h"
 
-#include "render/imgui/UIManager.h"
+#include "render/imgui/UIContextData.h"
+
 // gfx
 #include "gfx-base/GFXDevice.h"
 
@@ -33,8 +34,6 @@ void NativePipelineSample::initScene() {
 
     uiModel = addModel("UIModel");
     _scene->addModel(uiModel);
-
-    exp::UIManager::get()->initUI();
 }
 
 void NativePipelineSample::initWindowEvent() {
@@ -143,8 +142,6 @@ void NativePipelineSample::onClose() {
     _scene = nullptr;
     _mainRenderWindow = nullptr;
 
-    exp::UIManager::get()->destroy();
-
     _cameras.clear();
     _ppl = nullptr;
     for (auto *swapchain : _swapChains) {
@@ -162,7 +159,7 @@ void NativePipelineSample::onTick(float time) {
             return a->getPriority() < b->getPriority();
         });
 
-//        _scene->update(time);
+        onSceneTick(time);
 
         _device->acquire(_swapChains);
 
@@ -204,5 +201,9 @@ void NativePipelineSample::setActive(scene::Camera *camera) {
 
 void NativePipelineSample::setDeActive(scene::Camera *camera) {
     _activeCameras.erase(std::remove(_activeCameras.begin(), _activeCameras.end(), camera), _activeCameras.end());
+}
+
+void NativePipelineSample::onSceneTick(float time) {
+    _renderScene.tick(time);
 }
 }
